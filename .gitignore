@@ -1,0 +1,13 @@
+/.gradle/
+/.settings/
+/.classpath
+/.project
+/setting.json
+/build/
+/bin/
+/setting/setting.properties
+/setting/setting-local.properties
+/logs/
+/custom-runtime/
+/ImageHelper*.exe
+/ImageHelper*.jar

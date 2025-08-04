@@ -1,0 +1,30 @@
+plugins {
+  id 'java'
+  id 'application'
+  id 'eclipse'
+}
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
+}
+
+compileJava.options.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'app.webarata3.imagehelper.App'
+    }
+}
+
+application {
+    mainClass = 'app.webarata3.imagehelper.App'
+}
