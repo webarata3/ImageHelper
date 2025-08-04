@@ -16,7 +16,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Collections;
+import java.util.Set;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 public class ImageHelper extends JFrame {
     private JPanel thumbnailPanel;
@@ -41,8 +43,7 @@ public class ImageHelper extends JFrame {
     private static final String PREF_KEY_LAST_DIR = "last_opened_directory";
     private Preferences prefs = Preferences.userNodeForPackage(getClass());
 
-    private final java.util.Set<Path> displayedImages = java.util.Collections
-            .synchronizedSet(new java.util.HashSet<>());
+    private final Set<Path> displayedImages = Collections.synchronizedSet(new java.util.HashSet<>());
     private Path currentFolderPath = null;
 
     public ImageHelper() {
@@ -54,11 +55,11 @@ public class ImageHelper extends JFrame {
         folderPathLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         infoPanel.add(folderPathLabel);
 
-        JButton selectFolderBtn = new JButton("フォルダーを選択");
+        var selectFolderBtn = new JButton("フォルダーを選択");
         selectFolderBtn.addActionListener(a -> chooseFolder());
         infoPanel.add(selectFolderBtn);
 
-        JButton captureBtn = new JButton("画面キャプチャ");
+        var captureBtn = new JButton("画面キャプチャ");
         captureBtn.addActionListener(a -> startCapture());
         infoPanel.add(captureBtn);
 
@@ -93,10 +94,10 @@ public class ImageHelper extends JFrame {
 
     // フォルダーを選択してサムネイル表示
     private void chooseFolder() {
-        JFileChooser chooser = new JFileChooser();
+        var chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-            File folder = chooser.getSelectedFile();
+            var folder = chooser.getSelectedFile();
             folderPathLabel.setText("現在のフォルダー: " + folder.getAbsolutePath());
             prefs.put(PREF_KEY_LAST_DIR, folder.getAbsolutePath()); // 保存
 
@@ -106,9 +107,9 @@ public class ImageHelper extends JFrame {
     }
 
     private void openLastFolderIfExists() {
-        String lastPath = prefs.get(PREF_KEY_LAST_DIR, null);
+        var lastPath = prefs.get(PREF_KEY_LAST_DIR, null);
         if (lastPath != null) {
-            File folder = new File(lastPath);
+            var folder = new File(lastPath);
             if (folder.exists() && folder.isDirectory()) {
                 folderPathLabel.setText("現在のフォルダー: " + folder.getAbsolutePath());
                 showThumbnails(folder.toPath());
@@ -121,22 +122,22 @@ public class ImageHelper extends JFrame {
         this.currentFolderPath = folderPath; // 現在のフォルダー記録
 
         try {
-            List<Path> imagePaths = Files.list(folderPath).filter(Files::isRegularFile).filter(p -> {
-                String name = p.getFileName().toString().toLowerCase();
+            var imagePaths = Files.list(folderPath).filter(Files::isRegularFile).filter(p -> {
+                var name = p.getFileName().toString().toLowerCase();
                 return name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png")
                         || name.endsWith(".gif");
             }).collect(Collectors.toList());
 
-            for (Path path : imagePaths) {
+            for (var path : imagePaths) {
                 if (displayedImages.contains(path))
                     continue;
 
-                BufferedImage original = ImageIO.read(path.toFile());
+                var original = ImageIO.read(path.toFile());
                 if (original == null)
                     continue;
 
-                Image thumb = getScaledImageKeepAspectRatio(original, 100, 100);
-                JLabel label = new JLabel(new ImageIcon(thumb));
+                var thumb = getScaledImageKeepAspectRatio(original, 100, 100);
+                var label = new JLabel(new ImageIcon(thumb));
                 label.setToolTipText(path.getFileName().toString());
 
                 label.addMouseListener(new MouseAdapter() {
@@ -161,8 +162,8 @@ public class ImageHelper extends JFrame {
     }
 
     private void startFolderMonitor() {
-        int delayMillis = 5000; // 5秒おきに確認
-        new javax.swing.Timer(delayMillis, e -> {
+        var delayMillis = 5000; // 5秒おきに確認
+        new Timer(delayMillis, e -> {
             if (currentFolderPath != null) {
                 showThumbnails(currentFolderPath);
             }
@@ -170,25 +171,25 @@ public class ImageHelper extends JFrame {
     }
 
     private Image getScaledImageKeepAspectRatio(BufferedImage img, int maxWidth, int maxHeight) {
-        int width = img.getWidth();
-        int height = img.getHeight();
-        double scale = Math.min((double) maxWidth / width, (double) maxHeight / height);
-        int newWidth = (int) (width * scale);
-        int newHeight = (int) (height * scale);
+        var width = img.getWidth();
+        var height = img.getHeight();
+        var scale = Math.min((double) maxWidth / width, (double) maxHeight / height);
+        var newWidth = (int) (width * scale);
+        var newHeight = (int) (height * scale);
         return img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
     }
 
     private void showDraggableResizableImage(Path imagePath) {
         try {
-            BufferedImage originalImage = ImageIO.read(imagePath.toFile());
+            var originalImage = ImageIO.read(imagePath.toFile());
             if (originalImage == null)
                 return;
 
-            JWindow window = new JWindow();
+            var window = new JWindow();
             window.setAlwaysOnTop(true);
             window.setBackground(Color.BLACK);
 
-            JLabel imageLabel = new JLabel();
+            var imageLabel = new JLabel();
             imageLabel.setHorizontalAlignment(JLabel.CENTER);
             imageLabel.setVerticalAlignment(JLabel.CENTER);
             imageLabel.setOpaque(true);
@@ -196,20 +197,20 @@ public class ImageHelper extends JFrame {
 
             imageLabel.setIcon(new ImageIcon(originalImage));
 
-            JScrollPane scrollPane = new JScrollPane(imageLabel);
+            var scrollPane = new JScrollPane(imageLabel);
             scrollPane.setBorder(null);
             window.getContentPane().setLayout(new BorderLayout());
             window.getContentPane().add(scrollPane, BorderLayout.CENTER);
 
             window.setSize(originalImage.getWidth(), originalImage.getHeight());
-            Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+            var screen = Toolkit.getDefaultToolkit().getScreenSize();
             window.setLocation((screen.width - window.getWidth()) / 2, (screen.height - window.getHeight()) / 2);
 
             final int RESIZE_MARGIN = 10;
             final Point[] mouseDownCoords = { null };
             final boolean[] resizing = { false };
 
-            MouseAdapter unifiedMouseHandler = new MouseAdapter() {
+            var unifiedMouseHandler = new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     Component c = e.getComponent();
@@ -226,34 +227,33 @@ public class ImageHelper extends JFrame {
 
                 @Override
                 public void mouseDragged(MouseEvent e) {
-                    Component c = e.getComponent();
                     if (resizing[0]) {
-                        Point p = e.getPoint();
+                        var p = e.getPoint();
                         // 基準画像のサイズ
-                        double aspect = (double) originalImage.getWidth() / originalImage.getHeight();
+                        var aspect = (double) originalImage.getWidth() / originalImage.getHeight();
 
                         // マウスの位置を元に仮の幅と高さを計算（縦横比維持）
-                        int newWidth = Math.max(100, p.x);
-                        int newHeight = (int) (newWidth / aspect);
+                        var newWidth = Math.max(100, p.x);
+                        var newHeight = (int) (newWidth / aspect);
 
                         // ウィンドウに反映
                         window.setSize(newWidth, newHeight);
 
                         // スケーリング再設定（表示サイズに応じて）
-                        Dimension viewSize = scrollPane.getViewport().getSize();
-                        Image scaled = getScaledImageKeepAspectRatio(originalImage, viewSize.width, viewSize.height);
+                        var viewSize = scrollPane.getViewport().getSize();
+                        var scaled = getScaledImageKeepAspectRatio(originalImage, viewSize.width, viewSize.height);
                         imageLabel.setIcon(new ImageIcon(scaled));
                     } else if (mouseDownCoords[0] != null) {
                         // ウィンドウ移動処理
-                        Point currCoords = e.getLocationOnScreen();
+                        var currCoords = e.getLocationOnScreen();
                         window.setLocation(currCoords.x - mouseDownCoords[0].x, currCoords.y - mouseDownCoords[0].y);
                     }
                 }
 
                 @Override
                 public void mouseMoved(MouseEvent e) {
-                    Component c = e.getComponent();
-                    Dimension size = c.getSize();
+                    var c = e.getComponent();
+                    var size = c.getSize();
                     if (e.getX() >= size.width - RESIZE_MARGIN && e.getY() >= size.height - RESIZE_MARGIN) {
                         c.setCursor(Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR));
                     } else {
@@ -270,7 +270,7 @@ public class ImageHelper extends JFrame {
             };
 
             // imageLabel または scrollPane.getViewport().getView() にリスナーを登録
-            Component imageComponent = scrollPane.getViewport().getView();
+            var imageComponent = scrollPane.getViewport().getView();
             imageComponent.addMouseListener(unifiedMouseHandler);
             imageComponent.addMouseMotionListener(unifiedMouseHandler);
             window.setVisible(true);
@@ -279,5 +279,4 @@ public class ImageHelper extends JFrame {
             JOptionPane.showMessageDialog(this, "画像を表示できませんでした: " + e.getMessage());
         }
     }
-
 }
