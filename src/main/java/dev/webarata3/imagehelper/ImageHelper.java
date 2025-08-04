@@ -11,6 +11,8 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +43,10 @@ public class ImageHelper extends JFrame {
     private JScrollPane scrollPane;
     private JLabel folderPathLabel;
     private static final String PREF_KEY_LAST_DIR = "last_opened_directory";
+    private static final String PREF_KEY_WINDOW_WIDTH = "window_width";
+    private static final String PREF_KEY_WINDOW_HEIGHT = "window_height";
+    private static final String PREF_KEY_WINDOW_X = "window_x";
+    private static final String PREF_KEY_WINDOW_Y = "window_y";
     private Preferences prefs = Preferences.userNodeForPackage(getClass());
 
     private final Set<Path> displayedImages = Collections.synchronizedSet(new java.util.HashSet<>());
@@ -54,7 +60,6 @@ public class ImageHelper extends JFrame {
 
         var icon = new ImageIcon(getClass().getResource("/icon.png")).getImage();
         setIconImage(icon);
-        setSize(900, 600);
 
         createNoFolderLayout();
         createSelectedFolderLayout();
@@ -67,6 +72,28 @@ public class ImageHelper extends JFrame {
         } else {
             setContentPane(selectedFolderPanel);
         }
+
+        Preferences prefs = Preferences.userNodeForPackage(getClass());
+
+        var width = prefs.getInt(PREF_KEY_WINDOW_WIDTH, 800);
+        var height = prefs.getInt(PREF_KEY_WINDOW_HEIGHT, 600);
+        var x = prefs.getInt(PREF_KEY_WINDOW_X, 100);
+        var y = prefs.getInt(PREF_KEY_WINDOW_Y, 100);
+        setSize(width, height);
+        setLocation(x, y);
+
+        // 終了時に保存
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                var size = getSize();
+                prefs.putInt(PREF_KEY_WINDOW_WIDTH, size.width);
+                prefs.putInt(PREF_KEY_WINDOW_HEIGHT, size.height);
+
+                var location = getLocation();
+                prefs.putInt(PREF_KEY_WINDOW_X, location.x);
+                prefs.putInt(PREF_KEY_WINDOW_Y, location.y);
+            }
+        });
 
         setVisible(true);
 
