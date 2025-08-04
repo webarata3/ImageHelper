@@ -3,8 +3,6 @@ package dev.webarata3.imagehelper;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
 import java.awt.Container;
-import java.awt.Insets;
-import java.awt.Component;
 
 // --- WrapLayout クラス（FlowLayout 拡張：折り返し） ---
 // https://tips4java.wordpress.com/2008/11/06/wrap-layout/
