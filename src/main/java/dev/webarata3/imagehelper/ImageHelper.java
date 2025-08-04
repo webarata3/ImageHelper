@@ -46,8 +46,48 @@ public class ImageHelper extends JFrame {
     private final Set<Path> displayedImages = Collections.synchronizedSet(new java.util.HashSet<>());
     private Path currentFolderPath = null;
 
+    private JPanel noFolderPanel;
+    private JPanel selectedFolderPanel;
+
     public ImageHelper() {
         super("画像サムネイルビューア");
+
+        var icon = new ImageIcon(getClass().getResource("/icon.png")).getImage();
+        setIconImage(icon);
+        setSize(900, 600);
+
+        createNoFolderLayout();
+        createSelectedFolderLayout();
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        openLastFolderIfExists();
+        if (currentFolderPath == null) {
+            setContentPane(noFolderPanel);
+        } else {
+            setContentPane(selectedFolderPanel);
+        }
+
+        setVisible(true);
+
+        startFolderMonitor();
+    }
+
+    private void createNoFolderLayout() {
+        noFolderPanel = new JPanel();
+        noFolderPanel.setLayout(new BorderLayout());
+
+        var messageLabel = new JLabel("フォルダーを選択してください");
+        noFolderPanel.add(messageLabel, BorderLayout.NORTH);
+
+        var selectFolderBtn = new JButton("フォルダーを選択");
+        selectFolderBtn.addActionListener(a -> chooseFolder());
+        noFolderPanel.add(selectFolderBtn, BorderLayout.CENTER);
+    }
+
+    private void createSelectedFolderLayout() {
+        selectedFolderPanel = new JPanel();
+        selectedFolderPanel.setLayout(new BorderLayout());
 
         var infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
@@ -69,17 +109,8 @@ public class ImageHelper extends JFrame {
         scrollPane = new JScrollPane(thumbnailPanel);
 
         // レイアウト設定
-        setLayout(new BorderLayout());
-        add(infoPanel, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
-
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        pack();
-        setLocationRelativeTo(null);
-        openLastFolderIfExists();
-        setVisible(true);
-
-        startFolderMonitor();
+        selectedFolderPanel.add(infoPanel, BorderLayout.NORTH);
+        selectedFolderPanel.add(scrollPane, BorderLayout.CENTER);
     }
 
     private void startCapture() {
@@ -99,6 +130,9 @@ public class ImageHelper extends JFrame {
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             var folder = chooser.getSelectedFile();
             folderPathLabel.setText("現在のフォルダー: " + folder.getAbsolutePath());
+            setContentPane(selectedFolderPanel);
+            pack();
+            setLocationRelativeTo(null);
             prefs.put(PREF_KEY_LAST_DIR, folder.getAbsolutePath()); // 保存
 
             displayedImages.clear();

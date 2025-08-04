@@ -28,3 +28,14 @@ jar {
 application {
     mainClass = 'dev.webarata3.imagehelper.App'
 }
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
+}
