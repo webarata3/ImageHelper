@@ -7,24 +7,17 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
@@ -98,87 +91,6 @@ public class ImageHelper extends JFrame {
         SwingUtilities.invokeLater(() -> {
             new CaptureOverlay(ImageHelper.this, currentFolderPath.toFile());
         });
-    }
-
-    class CaptureOverlay extends JWindow {
-        private Point start, end;
-        private final File saveFolder;
-
-        public CaptureOverlay(JFrame parent, File saveFolder) {
-            super(parent); // オーナーを設定
-            this.saveFolder = saveFolder;
-
-            setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
-            setBackground(new Color(0, 0, 0, 50));
-            setAlwaysOnTop(true);
-            setVisible(true);
-
-            addMouseListener(new MouseAdapter() {
-                public void mousePressed(MouseEvent e) {
-                    start = e.getPoint();
-                }
-
-                public void mouseReleased(MouseEvent e) {
-                    end = e.getPoint();
-                    captureScreen();
-                    dispose();
-                }
-            });
-
-            addMouseMotionListener(new MouseMotionAdapter() {
-                public void mouseDragged(MouseEvent e) {
-                    end = e.getPoint();
-                    repaint();
-                }
-            });
-        }
-
-        public void paint(Graphics g) {
-            super.paint(g);
-            if (start != null && end != null) {
-                int x = Math.min(start.x, end.x);
-                int y = Math.min(start.y, end.y);
-                int w = Math.abs(start.x - end.x);
-                int h = Math.abs(start.y - end.y);
-                g.setColor(Color.RED);
-                g.drawRect(x, y, w, h);
-            }
-        }
-
-        private void captureScreen() {
-            if (start == null || end == null)
-                return;
-
-            int x = Math.min(start.x, end.x);
-            int y = Math.min(start.y, end.y);
-            int w = Math.abs(start.x - end.x);
-            int h = Math.abs(start.y - end.y);
-
-            try {
-                // オーバーレイを非表示（Robot の前に必要）
-                setVisible(false);
-
-                // 十分に非表示になるのを待つ（描画のタイミングを考慮）
-                Thread.sleep(200);
-
-                Robot robot = new Robot();
-                BufferedImage image = robot.createScreenCapture(new Rectangle(x, y, w, h));
-                String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-                File output = new File(saveFolder, "screenshot_" + timestamp + ".png");
-                ImageIO.write(image, "png", output);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            } finally {
-                dispose(); // オーバーレイを破棄
-
-                // 親ウィンドウを再表示
-                SwingUtilities.invokeLater(() -> {
-                    if (getOwner() != null) {
-                        getOwner().setVisible(true);
-                    }
-                });
-            }
-        }
     }
 
     // フォルダーを選択してサムネイル表示
