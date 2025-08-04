@@ -21,10 +21,10 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'app.webarata3.imagehelper.App'
+        attributes 'Main-Class': 'dev.webarata3.imagehelper.App'
     }
 }
 
 application {
-    mainClass = 'app.webarata3.imagehelper.App'
+    mainClass = 'dev.webarata3.imagehelper.App'
 }

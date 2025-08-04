@@ -1,4 +1,4 @@
-package app.webarata3.imagehelper;
+package dev.webarata3.imagehelper;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;

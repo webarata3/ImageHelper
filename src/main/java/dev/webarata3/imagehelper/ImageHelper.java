@@ -1,4 +1,4 @@
-package app.webarata3.imagehelper;
+package dev.webarata3.imagehelper;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
