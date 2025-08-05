@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -67,6 +68,7 @@ public class ImageHelper extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         openLastFolderIfExists();
+
         if (currentFolderPath == null) {
             setContentPane(noFolderPanel);
         } else {
@@ -119,7 +121,8 @@ public class ImageHelper extends JFrame {
         var infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         folderPathLabel = new JLabel("フォルダーを選択してください");
-        folderPathLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        folderPathLabel.setFont(new Font("BIZ UDゴシック", Font.PLAIN, 20));
+        folderPathLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         infoPanel.add(folderPathLabel);
 
         var selectFolderBtn = new JButton("フォルダーを選択");
@@ -132,7 +135,9 @@ public class ImageHelper extends JFrame {
 
         // サムネイル表示パネル
         thumbnailPanel = new JPanel(new WrapLayout(FlowLayout.LEFT, 10, 10));
-        thumbnailPanel.setPreferredSize(new Dimension(800, 600));
+        // thumbnailPanel.setPreferredSize(new Dimension(800, 600));
+        // scrollPane = new JScrollPane(thumbnailPanel);
+        thumbnailPanel = new ScrollablePanel(new WrapLayout(FlowLayout.LEFT, 10, 10));
         scrollPane = new JScrollPane(thumbnailPanel);
 
         // レイアウト設定
