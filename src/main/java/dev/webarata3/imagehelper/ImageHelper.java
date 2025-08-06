@@ -10,6 +10,8 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -58,6 +60,7 @@ public class ImageHelper extends JFrame {
 
     private JPanel noFolderPanel;
     private JPanel selectedFolderPanel;
+    private JLabel selectedLabel = null;
 
     public ImageHelper() {
         super("画像サムネイルビューア");
@@ -97,6 +100,24 @@ public class ImageHelper extends JFrame {
                 var location = getLocation();
                 prefs.putInt(PREF_KEY_WINDOW_X, location.x);
                 prefs.putInt(PREF_KEY_WINDOW_Y, location.y);
+            }
+        });
+
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (selectedLabel != null && e.getKeyCode() == KeyEvent.VK_DELETE) {
+                    thumbnailPanel.remove(selectedLabel);
+                    try {
+                        Files.deleteIfExists(currentFolderPath.resolve(selectedLabel.getToolTipText()));
+                    } catch (IOException ex) {
+                    }
+                    displayedImages.remove(currentFolderPath.resolve(selectedLabel.getToolTipText()));
+                    imageLabels.remove(currentFolderPath.resolve(selectedLabel.getToolTipText()));
+                    selectedLabel = null;
+                    thumbnailPanel.revalidate();
+                    thumbnailPanel.repaint();
+                }
             }
         });
 
@@ -212,12 +233,24 @@ public class ImageHelper extends JFrame {
                 var thumb = getScaledImageKeepAspectRatio(original, 100, 100);
                 var label = new JLabel(new ImageIcon(thumb));
                 label.setToolTipText(path.getFileName().toString());
+                label.setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0, 0), 1));
 
                 label.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
+                        for (var comp : thumbnailPanel.getComponents()) {
+                            if (comp instanceof JLabel) {
+                                ((JLabel) comp).setBorder(BorderFactory.createLineBorder(new Color(0, 0, 0, 0), 1));
+                            }
+                        }
                         if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
                             showDraggableResizableImage(path);
+                        } else {
+                            selectedLabel = (JLabel) e.getComponent();
+                            selectedLabel.setBorder(BorderFactory.createLineBorder(new Color(255, 0, 0), 1));
+
+                            // フォーカスをフレームに戻してキーを受け取れるように
+                            ImageHelper.this.requestFocusInWindow();
                         }
                     }
                 });
