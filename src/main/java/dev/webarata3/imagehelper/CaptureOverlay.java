@@ -65,8 +65,7 @@ class CaptureOverlay extends JWindow {
     }
 
     private void captureScreen() {
-        if (start == null || end == null)
-            return;
+        if (start == null || end == null) return;
 
         var x = Math.min(start.x, end.x);
         var y = Math.min(start.y, end.y);

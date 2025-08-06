@@ -195,12 +195,10 @@ public class ImageHelper extends JFrame {
             }).collect(Collectors.toList());
 
             for (var path : imagePaths) {
-                if (displayedImages.contains(path))
-                    continue;
+                if (displayedImages.contains(path)) continue;
 
                 var original = ImageIO.read(path.toFile());
-                if (original == null)
-                    continue;
+                if (original == null) continue;
 
                 var thumb = getScaledImageKeepAspectRatio(original, 100, 100);
                 var label = new JLabel(new ImageIcon(thumb));
@@ -248,8 +246,7 @@ public class ImageHelper extends JFrame {
     private void showDraggableResizableImage(Path imagePath) {
         try {
             var originalImage = ImageIO.read(imagePath.toFile());
-            if (originalImage == null)
-                return;
+            if (originalImage == null) return;
 
             var window = new JWindow();
             window.setAlwaysOnTop(true);

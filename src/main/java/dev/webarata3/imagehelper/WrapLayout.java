@@ -45,8 +45,7 @@ public class WrapLayout extends FlowLayout {
             var rowHeight = 0;
 
             for (var comp : target.getComponents()) {
-                if (!comp.isVisible())
-                    continue;
+                if (!comp.isVisible()) continue;
                 var d = preferred ? comp.getPreferredSize() : comp.getMinimumSize();
                 if (x + d.width > maxWidth) {
                     x = 0;
