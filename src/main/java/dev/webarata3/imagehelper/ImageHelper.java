@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
@@ -51,6 +53,7 @@ public class ImageHelper extends JFrame {
     private Preferences prefs = Preferences.userNodeForPackage(getClass());
 
     private final Set<Path> displayedImages = Collections.synchronizedSet(new java.util.HashSet<>());
+    private final Map<Path, JLabel> imageLabels = new HashMap<>();
     private Path currentFolderPath = null;
 
     private JPanel noFolderPanel;
@@ -168,6 +171,7 @@ public class ImageHelper extends JFrame {
             prefs.put(PREF_KEY_LAST_DIR, folder.getAbsolutePath()); // 保存
 
             displayedImages.clear();
+            imageLabels.clear();
             showThumbnails(folder.toPath());
         }
     }
@@ -194,6 +198,11 @@ public class ImageHelper extends JFrame {
                         || name.endsWith(".gif");
             }).collect(Collectors.toList());
 
+            displayedImages.stream().filter(displayedImage -> !imagePaths.contains(displayedImage))
+                    .forEach(displayImage -> {
+                        thumbnailPanel.remove(imageLabels.get(displayImage));
+                    });
+
             for (var path : imagePaths) {
                 if (displayedImages.contains(path)) continue;
 
@@ -215,6 +224,7 @@ public class ImageHelper extends JFrame {
 
                 thumbnailPanel.add(label);
                 displayedImages.add(path); // 表示済みとして記録
+                imageLabels.put(path, label); // ラベルを記録
             }
 
         } catch (Exception e) {
